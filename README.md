@@ -991,3 +991,29 @@ AND DS.GRANTEE = DU.USERNAME);
 
 ALTER SYSTEM KILL SESSION '240,14168' IMMEDIATE;
 ```
+
+
+![Ekran görüntüsü 2024-07-20 000954](https://github.com/user-attachments/assets/6c54885d-f64e-4760-957e-ab8bfc050701)
+![Ekran görüntüsü 2024-07-19 201537](https://github.com/user-attachments/assets/1ec9fc7b-af23-439c-a7d0-cfe429ae2995)
+![Ekran görüntüsü 2024-07-19 194823](https://github.com/user-attachments/assets/d5a650cd-3ac7-49cc-95b5-50a5f7a0c0a6)
+![Ekran görüntüsü 2024-07-19 193342](https://github.com/user-attachments/assets/87871005-36bf-4ba9-b24a-fe1f4afb9b0f)
+![Ekran görüntüsü 2024-07-19 192742](https://github.com/user-attachments/assets/8f92d449-7e1c-4199-bf9b-51566d2160c6)
+![Ekran görüntüsü 2024-07-19 181808](https://github.com/user-attachments/assets/743eb767-a4b6-45af-8f83-9f67c3d69991)
+![Ekran görüntüsü 2024-07-19 150516](https://github.com/user-attachments/assets/dd6b7e1b-0e1f-4b8e-8d55-5c8dd37b2e9a)
+![Ekran görüntüsü 2024-07-14 155347](https://github.com/user-attachments/assets/1ad5122e-45b0-4400-9dc0-9ccf7a4ef241)
+![sqldeveloper](https://github.com/user-attachments/assets/90dde8dc-1ed2-406b-af0a-566589b875d4)
+![Ekran görüntüsü 2024-07-25 145921](https://github.com/user-attachments/assets/2fc581d3-b61a-40d9-8e9f-e10b6d655b3e)
+![Ekran görüntüsü 2024-07-23 221614](https://github.com/user-attachments/assets/07431c96-3045-4a37-8f2b-5f0f90487710)
+![Ekran görüntüsü 2024-07-23 212029](https://github.com/user-attachments/assets/6643fc3c-2b45-4c5a-b372-fe83a7049878)
+![Ekran görüntüsü 2024-07-23 181710](https://github.com/user-attachments/assets/fa51b41f-0eb8-4b68-974e-b6f180011cc3)
+![Ekran görüntüsü 2024-07-23 174132](https://github.com/user-attachments/assets/940a85cc-1299-47c6-8860-c005b0f5f87b)
+![Ekran görüntüsü 2024-07-23 171624](https://github.com/user-attachments/assets/8e39f2ad-49b1-4d7a-bf24-7b4b67ebc762)
+![Ekran görüntüsü 2024-07-20 223845](https://github.com/user-attachments/assets/0e6889cd-4ae4-4d18-8a84-730d1ca1fb69)
+![Ekran görüntüsü 2024-07-20 221429](https://github.com/user-attachments/assets/8e3c1808-ad31-4333-a477-9cc74ad9852b)
+![Ekran görüntüsü 2024-07-20 220800](https://github.com/user-attachments/assets/b85f5d3d-ca2b-473f-b515-5d686c73a835)
+![Ekran görüntüsü 2024-07-20 211408](https://github.com/user-attachments/assets/280c628a-307b-4bc2-a489-bf6f657a29ab)
+![Ekran görüntüsü 2024-07-20 210850](https://github.com/user-attachments/assets/dfcff687-129e-41ce-b8b8-4a48abeaf72c)
+![Ekran görüntüsü 2024-07-20 210534](https://github.com/user-attachments/assets/b7c490c4-02a7-4330-962c-a71966dba23b)
+![Ekran görüntüsü 2024-07-20 210345](https://github.com/user-attachments/assets/680a941f-4f6e-41ab-b800-7934cc0c3a07)
+![Ekran görüntüsü 2024-07-20 210325](https://github.com/user-attachments/assets/b9753d22-e44e-44ed-854f-9a473f9c0eaa)
+![Ekran görüntüsü 2024-07-20 002514](https://github.com/user-attachments/assets/31c2b665-c386-482e-9303-361dbda13c9e)
