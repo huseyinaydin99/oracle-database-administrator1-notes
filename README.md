@@ -1,237 +1,329 @@
 # oracle-database-administrator1-notes
+
 LINUX ÜZERINE ORACLE DATABASE 19C KURULUMU
+
 (Aksi belirtilmedikçe tüm islemler root kullanicisyla yapilacak)
+
 (Windows tarafindan COPY-PASTE Yapabilmek için)
 DEVICE -- > INSERT GUEST ADDITIONS CD IMAGE ...  
 RESTART VIRTUAL MACHINE
 change resolution 1920 x1080
+
 1. HOST FILE DEGISIKLIGI
+
 vim /etc/hosts
+
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 192.168.1.77 dbserver.localdomain dbserver
+
 2.  Kurulum Öncesi Hazirliklar
-A) Otomatik Setup
-a) Database Kurulumu Öncesi bazi paketlerin otomatik yüklenmesi
-bazi klasörlerin ve dosyalarin otomatik olusturulmasi
-oracle kullanicisinin ve oracle gruplarinin otomatik olusturulmasi
-Ilgili klasörlere Oracle kullanicisinin otomatik yetkilendirilmesi
-dnf install -y oracle-database-preinstall-19c
-b) Oracle Linux 8.7 ile ilgili güncellemelerin yüklenmesi
-yum update -y
-B) Manual Setup
-a) /etc/sysctl.conf dosyasi içine gerekli parametrelerin eklenmesi
-/etc/sysctl.conf dosyasini vi ya da vim ile edit edip
-asagidaki satirlari ekleyin.
-fs.file-max = 6815744
-kernel.sem = 250 32000 100 128
-kernel.shmmni = 4096
-kernel.shmall = 1073741824
-kernel.shmmax = 4398046511104
-kernel.panic_on_oops = 1
-net.core.rmem_default = 262144
-net.core.rmem_max = 4194304
-net.core.wmem_default = 262144
-net.core.wmem_max = 1048576
-net.ipv4.conf.all.rp_filter = 2
-net.ipv4.conf.default.rp_filter = 2
-fs.aio-max-nr = 1048576
-net.ipv4.ip_local_port_range = 9000 65500
-b) Kernel Parametresinin Degistirilmesi
-(asagidaki ifadeyi komut satirina yazip çalistirin)
-$/sbin/sysctl
-c) Oracle konfigurasyon Dosyasina Güvenlik Limitlerinin eklenmesi
-/etc/security/limits.d/oracle-database-preinstall-19c.conf dosyasini
-vi ya da vim ile edit edip asagidaki satirlari ekleyin.
-oracle   soft   nofile    1024
-oracle   hard   nofile    65536
-oracle   soft   nproc    16384
-oracle   hard   nproc    16384
-oracle   soft   stack    10240
-oracle   hard   stack    32768
-oracle   hard   memlock    134217728
-oracle   soft   memlock    134217728
-d) Database Kurulumu Için Gerekli Paketlerin Yüklenmesi
-Asagidaki satirlari kopyalayip komut satirina yapistirin
-ve yüklemenin bitmesini bekleyin.
-Yükleme esnasinda soru sorarsa yes yazip devam edin.
-dnf install -y bc
-dnf install -y binutils
-dnf install -y compat-libstdc++-33
-dnf install -y elfutils-libelf
-dnf install -y elfutils-libelf-devel
-dnf install -y fontconfig-devel
-dnf install -y glibc
-dnf install -y glibc-devel
-dnf install -y ksh
-dnf install -y libaio
-dnf install -y libaio-devel
-dnf install -y libXrender
-dnf install -y libXrender-devel
-dnf install -y libX11
-dnf install -y libXau
-dnf install -y libXi
-dnf install -y libXtst
-dnf install -y libgcc
-dnf install -y librdmacm-devel
-dnf install -y libstdc++
-dnf install -y libstdc++-devel
-dnf install -y libxcb
-dnf install -y make
-dnf install -y net-tools # Clusterware
-dnf install -y nfs-utils # ACFS
-dnf install -y python # ACFS
-dnf install -y python-configshell # ACFS
-dnf install -y python-rtslib # ACFS
-dnf install -y python-six # ACFS
-dnf install -y targetcli # ACFS
-dnf install -y smartmontools
-dnf install -y sysstat
-dnf install -y unixODBC
-dnf install -y libnsl
-dnf install -y libnsl.i686
-dnf install -y libnsl2
-dnf install -y libnsl2.i686
-e) Yeni Gruplarin ve Kullanicin Olusturulmasi
-Komut satirinda asagidaki satirlari tek tek çalistirin.
-groupadd -g 54321 oinstall
-groupadd -g 54322 dba
-groupadd -g 54323 oper
-useradd -u 54321 -g oinstall -G dba,oper oracle
+    A) Otomatik Setup
+    a) Database Kurulumu Öncesi bazi paketlerin otomatik yüklenmesi
+    bazi klasörlerin ve dosyalarin otomatik olusturulmasi
+    oracle kullanicisinin ve oracle gruplarinin otomatik olusturulmasi
+    Ilgili klasörlere Oracle kullanicisinin otomatik yetkilendirilmesi
+
+        	dnf install -y oracle-database-preinstall-19c
+
+    b) Oracle Linux 8.7 ile ilgili güncellemelerin yüklenmesi
+
+        	yum update -y
+
+    B) Manual Setup
+    a) /etc/sysctl.conf dosyasi içine gerekli parametrelerin eklenmesi
+    /etc/sysctl.conf dosyasini vi ya da vim ile edit edip
+    asagidaki satirlari ekleyin.
+
+           fs.file-max = 6815744
+           kernel.sem = 250 32000 100 128
+           kernel.shmmni = 4096
+           kernel.shmall = 1073741824
+           kernel.shmmax = 4398046511104
+           kernel.panic_on_oops = 1
+           net.core.rmem_default = 262144
+           net.core.rmem_max = 4194304
+           net.core.wmem_default = 262144
+           net.core.wmem_max = 1048576
+           net.ipv4.conf.all.rp_filter = 2
+           net.ipv4.conf.default.rp_filter = 2
+           fs.aio-max-nr = 1048576
+           net.ipv4.ip_local_port_range = 9000 65500
+
+        b) Kernel Parametresinin Degistirilmesi
+        (asagidaki ifadeyi komut satirina yazip çalistirin)
+
+           $/sbin/sysctl
+
+        c) Oracle konfigurasyon Dosyasina Güvenlik Limitlerinin eklenmesi
+           /etc/security/limits.d/oracle-database-preinstall-19c.conf dosyasini
+        	vi ya da vim ile edit edip asagidaki satirlari ekleyin.
+
+        	oracle   soft   nofile    1024
+        	oracle   hard   nofile    65536
+        	oracle   soft   nproc    16384
+        	oracle   hard   nproc    16384
+        	oracle   soft   stack    10240
+        	oracle   hard   stack    32768
+        	oracle   hard   memlock    134217728
+        	oracle   soft   memlock    134217728
+
+        d) Database Kurulumu Için Gerekli Paketlerin Yüklenmesi
+        	Asagidaki satirlari kopyalayip komut satirina yapistirin
+        	ve yüklemenin bitmesini bekleyin.
+        	Yükleme esnasinda soru sorarsa yes yazip devam edin.
+
+        	dnf install -y bc
+        	dnf install -y binutils
+        	dnf install -y compat-libstdc++-33
+        	dnf install -y elfutils-libelf
+        	dnf install -y elfutils-libelf-devel
+        	dnf install -y fontconfig-devel
+        	dnf install -y glibc
+        	dnf install -y glibc-devel
+        	dnf install -y ksh
+        	dnf install -y libaio
+        	dnf install -y libaio-devel
+        	dnf install -y libXrender
+        	dnf install -y libXrender-devel
+        	dnf install -y libX11
+        	dnf install -y libXau
+        	dnf install -y libXi
+        	dnf install -y libXtst
+        	dnf install -y libgcc
+        	dnf install -y librdmacm-devel
+        	dnf install -y libstdc++
+        	dnf install -y libstdc++-devel
+        	dnf install -y libxcb
+        	dnf install -y make
+        	dnf install -y net-tools # Clusterware
+        	dnf install -y nfs-utils # ACFS
+        	dnf install -y python # ACFS
+        	dnf install -y python-configshell # ACFS
+        	dnf install -y python-rtslib # ACFS
+        	dnf install -y python-six # ACFS
+        	dnf install -y targetcli # ACFS
+        	dnf install -y smartmontools
+        	dnf install -y sysstat
+        	dnf install -y unixODBC
+        	dnf install -y libnsl
+        	dnf install -y libnsl.i686
+        	dnf install -y libnsl2
+        	dnf install -y libnsl2.i686
+
+        e) Yeni Gruplarin ve Kullanicin Olusturulmasi
+        	Komut satirinda asagidaki satirlari tek tek çalistirin.
+
+        	groupadd -g 54321 oinstall
+        	groupadd -g 54322 dba
+        	groupadd -g 54323 oper
+        	useradd -u 54321 -g oinstall -G dba,oper oracle
+
 ---
+
 NOT : (2) Maddedeki Otomatik Setup ya da Manual Setup'dan biri yapildiktan sonra
 Asagidaki (3) maddeden itibaren hepsi sirayla yapilmalidir.
+
 ---
+
 3.  oracle kullanicisinin sifresinin tanimlanmasi
-(Komut satirinda asagidaki komutu yazip çalistirin)
-passwd oracle
+
+    (Komut satirinda asagidaki komutu yazip çalistirin)
+
+    passwd oracle
+
 4.  Linux Güvenlik Dosyasindaki SELINUX parametresinin degerini permissive yapin.
-/etc/selinux/config dosyasini vi ya da vim ile edit edip
-SELINUX=permissive yapin.
-Daha sonra komut satirinda asagidaki komutu çalistirin.
-setenforce Permissive
+
+    /etc/selinux/config dosyasini vi ya da vim ile edit edip
+
+    SELINUX=permissive yapin.
+
+    Daha sonra komut satirinda asagidaki komutu çalistirin.
+
+    setenforce Permissive
+
 5.  FIREWALL Kapatilmasi
-Komut satirinda asagidaki komutlari sirayla çalistirin.
-(Bu komutlar firewall'i stop edecek ve sanal makina kapatilip
-açildiginda firewall'i yeniden baslatmayacak.
-systemctl stop firewalld
-systemctl disable firewalld
+    Komut satirinda asagidaki komutlari sirayla çalistirin.
+    (Bu komutlar firewall'i stop edecek ve sanal makina kapatilip
+    açildiginda firewall'i yeniden baslatmayacak.
+
+    systemctl stop firewalld
+    systemctl disable firewalld
+
 6.  Database'in yüklenecegi klasörlerin olusturulmasi ve
-oracle kullanicisinin yetkilendirilmesi
-Asagidaki komutlari komut satirina sirayla yazip çalistirin.
-mkdir -p /u01/app/oracle/product/19.0.0/dbhome_1
-mkdir -p /u02/oradata
-chown -R oracle:oinstall /u01 /u02
-chmod -R 775 /u01 /u02
+    oracle kullanicisinin yetkilendirilmesi
+    Asagidaki komutlari komut satirina sirayla yazip çalistirin.
+
+    mkdir -p /u01/app/oracle/product/19.0.0/dbhome_1
+    mkdir -p /u02/oradata
+    chown -R oracle:oinstall /u01 /u02
+    chmod -R 775 /u01 /u02
+
 7.  Eger Database Install islemini konsoldan degil de
-bir SSH (PUTTY) araciligiyla yapacaksaniz asagidaki komutu çalistirin.
-xhost +dbserver.localdomain
+    bir SSH (PUTTY) araciligiyla yapacaksaniz asagidaki komutu çalistirin.
+
+    xhost +dbserver.localdomain
+
 8.  Start, stop, environment gibi islemleri yapacak scriptleri içinde
-tutacaginiz bir klasör olusturun.
-mkdir /home/oracle/scripts
+    tutacaginiz bir klasör olusturun.
+
+    mkdir /home/oracle/scripts
+
 9.  Environment parametreleri otomatik set edecek setENV.sh isimli bir dosya
-olusturun.
-(Asagidaki satirlari kopyalayip komut satirina yapistirin)
-(Veritabaninin ismini ORCL verdik. Farkli bir isim verdiyseniz
-o kisimlari degistirin)
-(Oracle Uniqname ve SID en fazla 8 karakter olmalidir)
-cat > /home/oracle/scripts/setEnv.sh <<EOF
-# Oracle Settings
-export TMP=/tmp
-export TMPDIR=\$TMP
-export ORACLE_HOSTNAME=dbserver.localdomain
-export ORACLE_UNQNAME=ORCL
-export ORACLE_BASE=/u01/app/oracle
-export ORACLE_HOME=\$ORACLE_BASE/product/19.0.0/dbhome_1
-export ORA_INVENTORY=/u01/app/oraInventory
-export ORACLE_SID=ORCL
-export DATA_DIR=/u02/oradata
-export PATH=/usr/sbin:/usr/local/bin:\$PATH
-export PATH=\$ORACLE_HOME/bin:\$PATH
-export LD_LIBRARY_PATH=\$ORACLE_HOME/lib:/lib:/usr/lib
-export CLASSPATH=\$ORACLE_HOME/jlib:\$ORACLE_HOME/rdbms/jlib
-EOF
+    olusturun.
+    (Asagidaki satirlari kopyalayip komut satirina yapistirin)
+    (Veritabaninin ismini ORCL verdik. Farkli bir isim verdiyseniz
+    o kisimlari degistirin)
+    (Oracle Uniqname ve SID en fazla 8 karakter olmalidir)
+
+    cat > /home/oracle/scripts/setEnv.sh <<EOF
+
+    # Oracle Settings
+
+    export TMP=/tmp
+    export TMPDIR=\$TMP
+    export ORACLE_HOSTNAME=dbserver.localdomain
+    export ORACLE_UNQNAME=ORCL
+    export ORACLE_BASE=/u01/app/oracle
+    export ORACLE_HOME=\$ORACLE_BASE/product/19.0.0/dbhome_1
+    export ORA_INVENTORY=/u01/app/oraInventory
+    export ORACLE_SID=ORCL
+    export DATA_DIR=/u02/oradata
+    export PATH=/usr/sbin:/usr/local/bin:\$PATH
+    export PATH=\$ORACLE_HOME/bin:\$PATH
+    export LD_LIBRARY_PATH=\$ORACLE_HOME/lib:/lib:/usr/lib
+    export CLASSPATH=\$ORACLE_HOME/jlib:\$ORACLE_HOME/rdbms/jlib
+    EOF
+
 10. setEnv.sh dosyasinin .bash_profile içine eklenmesi
-(Asagidaki komutu komut satirina yazip çalistirin)
-echo ". /home/oracle/scripts/setEnv.sh" >> /home/oracle/.bash_profile
+    (Asagidaki komutu komut satirina yazip çalistirin)
+
+    echo ". /home/oracle/scripts/setEnv.sh" >> /home/oracle/.bash_profile
+
 11. Veritabaninin kapatilip açilmasini saglayan scriptlerin olusturulmasi.
-a) start_all.sh sciptinin olusturulmasi.
-(Asagidaki satirlari komut satirina yapistirp çalistirin)
-cat > /home/oracle/scripts/start_all.sh <<EOF
-#!/bin/bash
-. /home/oracle/scripts/setEnv.sh
-export ORAENV_ASK=NO
-. oraenv
-export ORAENV_ASK=YES
-dbstart \$ORACLE_HOME
-EOF
-b) stop_all.sh sciptinin olusturulmasi.
-(Asagidaki satirlari komut satirina yapistirip çalistirin)
-cat > /home/oracle/scripts/stop_all.sh <<EOF
-#!/bin/bash
-. /home/oracle/scripts/setEnv.sh
-export ORAENV_ASK=NO
-. oraenv
-export ORAENV_ASK=YES
-dbshut \$ORACLE_HOME
-EOF
-c) scripts klasörünün owner'inin degistirilmesi ve
-bu klasör altindaki dosyalarin executable yapilmasi
-(Asagidaki satirlari komut satirina yapistirp çalistirin)
-chown -R oracle:oinstall /home/oracle/scripts
-chmod u+x /home/oracle/scripts/*.sh
+
+    a) start_all.sh sciptinin olusturulmasi.
+    (Asagidaki satirlari komut satirina yapistirp çalistirin)
+
+        cat > /home/oracle/scripts/start_all.sh <<EOF
+        #!/bin/bash
+        . /home/oracle/scripts/setEnv.sh
+        export ORAENV_ASK=NO
+        . oraenv
+        export ORAENV_ASK=YES
+        dbstart \$ORACLE_HOME
+        EOF
+
+    b) stop_all.sh sciptinin olusturulmasi.
+    (Asagidaki satirlari komut satirina yapistirip çalistirin)
+
+        cat > /home/oracle/scripts/stop_all.sh <<EOF
+        #!/bin/bash
+        . /home/oracle/scripts/setEnv.sh
+        export ORAENV_ASK=NO
+        . oraenv
+        export ORAENV_ASK=YES
+        dbshut \$ORACLE_HOME
+        EOF
+
+    c) scripts klasörünün owner'inin degistirilmesi ve
+    bu klasör altindaki dosyalarin executable yapilmasi
+    (Asagidaki satirlari komut satirina yapistirp çalistirin)
+
+        chown -R oracle:oinstall /home/oracle/scripts
+        chmod u+x /home/oracle/scripts/*.sh
+
 DB INSTALL
+
 12. Download Oracle Database 19c For Linux
+
 13. X Terminal yapmak için ((root ile)
-export DISPLAY=:0.0
-xhost +
+
+    export DISPLAY=:0.0
+    xhost +
+
 Bu asamadan sonrasi oracle kullanicisiyla yapilacak
+
 14. su - oracle
+
 15. mkdir /home/oracle/setup_files
+
 16. SETUP DOSYASINI WINDOWS'dan LINUX'a kopyala
-CMD
-cd C:\Users\Mehmet\Desktop\Setup_files
-scp LINUX.X64_193000_db_home.zip oracle@192.168.1.77:/home/oracle/setup_files
+    CMD
+    cd C:\Users\Mehmet\Desktop\Setup_files
+    scp LINUX.X64_193000_db_home.zip oracle@192.168.1.77:/home/oracle/setup_files
+
 scp spfileORCL.ora mehmet@192.168.1.65:C:\YEDEK
+
 Bu setup dosyasi ile isimiz bittiginde silinmelidir.
 Sanal makinada gereksiz yere yer isgal eder.
+
 17. Setup Dosyasini UNZIP ediyoruz
-cd $ORACLE_HOME
-unzip -oq /home/oracle/setup_files/LINUX.X64_193000_db_home.zip
-cat /etc/oracle-release
+
+    cd $ORACLE_HOME
+
+    unzip -oq /home/oracle/setup_files/LINUX.X64_193000_db_home.zip
+
+    cat /etc/oracle-release
+
 18. Setup çalistiriyoruz. (Database Install 1 - Setup Software Only)
-cd $ORACLE_HOME
-./runInstaller
+
+    cd $ORACLE_HOME
+    ./runInstaller
+
 \*\*\*\* HATA ALINIRSA
 ERROR: Unable to verify the graphical display setup.
 This application requires X display. Make sure that xdpyinfo exist
 under PATH variable.
+
 No X11 DISPLAY variable was set, but this program performed
 an operation which requires it.
+
 ---
+
 export CV_ASSUME_DISTID=OEL7.6 //Oracle Linux'un 7.6 versiyonu gibi davranmasını sağladık ki hata vermesin çünkü oracle database dosyası bu versiyonla uyumlu değil.
+
 export DISPLAY=:0.0
+
 ./runInstaller
+
 lsnrctl start
+
 dbca
+
 \*\*
 sqlplus / as sysdba
+
 select name from v$database;
+
 startup
+
 HATA ALINIRSA
+
 ORA-01078: failure in processing system parameters hatasi alinirsa
+
 set ORACLE_SID=ORCL
+
 sqlplus / as sysdba
+
 ---
+
 shutdown immediate;
+
 sqlplus mesajlarini Ingilizce görmek için
 root ile
 vi /etc/profile
+
 NLS_LANG=AMERICAN_AMERICA.WE8MSWIN1252
 export NLS_LANG
+
 restart virtual machine
+
 ---
+
 ALTER USER HR IDENTIFIED BY HR ACCOUNT UNLOCK;
+
 SQLcl Formatlari
+
 SELECT /_csv_/ * FROM emp;
 SELECT /*html*/ * FROM emp;
 SELECT /_xml_/ * FROM emp;
@@ -243,17 +335,29 @@ SELECT /*loader*/ * FROM emp;
 SELECT /_fixed_/ * FROM emp;
 SELECT /*delimited*/ * FROM emp;
 SELECT /_text_/ \* FROM emp;
+
 SET SQLFORMAT DEFAULT
+
 SET SQLFORMAT CSV
+
 SET SQLFORMAT HTML
+
 SET SQLFORMAT XML
+
 SET SQLFORMAT JSON-FORMATTED
+
 SET SQLFORMAT ANSICONSOLE
+
 SET SQLFORMAT INSERT
+
 SET SQLFORMAT LOADER
+
 SET SQLFORMAT FIXED
+
 SET SQLFORMAT DELIMITED ?? " "
+
 DDL EMPLOYEES
+
 ip addr //ip adresi ve diğer ağ bilgilerini verir.
 //windows tarafında cmd aç
 //sanal makinada ağ ayarlarına gel sağ üst köşeden.
@@ -275,9 +379,12 @@ windows> scp "resim.jpg" huseyin@192.168.1.77:/home/huseyin/Pictures //<<--tırn
 //sanalda misafir eklentilerini ekle.
 //run'a bas kur yeniden başlat.
 su - root
+
 vim /etc/hosts
+
 dnf install -y oracle-database-preinstall-19c
 yum update -y
+
 sqlplus /nolog //database bağlanmadan sadece sqlplus'ı çalıştırır.
 conn / as sysdba //sonradan bağlandık hacı.
 exit //sqlplustan çıktık.
@@ -302,6 +409,7 @@ sql / as sysdba;
 startup
 conn HR/HR
 select _ from employees; //emp yazar tab'a basarsan otomatik listeler.
+
 2>
 sql HR/HR
 set sqlformat ansiconsole;
@@ -331,12 +439,15 @@ SET SQLFORMAT DEFAULT; //ORİJİNAL FORMATA DÖNDÜRÜR.
 SET SQLFORMAT TEXT;
 sqlcl sqlplustan 3. farkı java runtime 1.7 ve üzeri ister.
 sqlplus java istemez.
+
 ---
+
 select instance_name, status from v$instance; //database ismini ve durumunu verir açık mı kapalı mı diye.
 select global_name from global_name; //servis ismini verir.
 lsnrctl status //listenerın yani bağlantı dinleyicinin durumunu verir.
 lsnrctl start //listeler'i çalıştırır ama ayarlamadığımız için problemli.
 The listener supports no services //listener çalıştı ama dinlediği bir servis yok. biraz bekle birazdan hazır hale geliyor.
+
 ------sanaldaki
 Oracle Enterprice Manager Database Express
 https://192.168.1.106:5500/em/login
@@ -345,9 +456,11 @@ oracle123
 ------ana makinadaki
 SGA: SYSTEM GLOBAL AREA
 PGA: PROCESS GLOBAL AREA
+
 hacı connect için
 lsnrctl status //bak
 lsnrctl start //başlat biraz bekle listener 1 dakika sonra falan açılıyor.
+
 1>
 sql / as sysdba;
 show user;
@@ -366,29 +479,36 @@ SHOW PARAMETER CONTROL_FILES // control dosyalarının tüm parametreleri göste
 show parameters file //içinde file geçen tüm parametleri gösterir.
 SELECT TABLESPACE_NAME, FILE_NAME, BYTES
 FROM DBA_DATA_FILES;
+
 SET LINESIZE 400
 COL TABLESPACE_NAME FOR a10
 COL FILE_NAME FOR a40
 COL BYTES FOR 999,999,999
 ED //EDİT NOT DEFTERİ İLE
 run veya / //bufferdeki son sorguyu çalıştırır.
+
 SHOW PARAMETER PFILE;
 Oracle SPFILE (Server Parameter File) ve PFILE (Parameter File) veritabanı yapılandırma parametrelerini depolayan dosyalardır.
+
 PFILE (Parameter File):
+
 Metin Dosyası: Kolayca düzenlenebilir bir metin dosyasıdır.
 Statik: Veritabanı başlatılmadan önce okunur ve veritabanı çalışırken değiştirilemez.
 Kullanımı: init.ora adında bir dosya olarak saklanır ve başlatma sırasında okunur.
 SPFILE (Server Parameter File):
+
 İkili Dosya: Metin tabanlı olmayan, ikili bir dosyadır.
 Dinamik: Veritabanı çalışırken değiştirilebilir ve değişiklikler anında uygulanabilir.
 Kullanımı: spfile.ora olarak saklanır ve Oracle tarafından otomatik olarak yönetilir.
 Karşılaştırma:
+
 Değişiklik Yapma: SPFILE dinamik olarak değiştirilebilir, PFILE ise değişiklikten sonra yeniden başlatma gerektirir.
 Yönetim Kolaylığı: SPFILE, yönetim kolaylığı ve esneklik sağlar.
 Kurtarma: PFILE, sorun giderme ve kurtarma senaryolarında daha basit olabilir.
 Her iki dosya da veritabanı yapılandırmasını tanımlar ve veritabanının nasıl davranacağını belirler, ancak SPFILE daha modern ve esnek bir yapı sunar.
 show parameter remote_login_pass //password file'ın bilgilerini verir.
 SELECT USERNAME, SYSDBA, SYSOPER FROM V$PWFILE_USERS;
+
 cd $ORACLE_HOME
 cd dbs
 GRANT SYSDBA TO HR;
@@ -396,6 +516,7 @@ REVOKE SYSDBA FROM HR;
 SELECT USERNAME, SYSDBA, SYSOPER, SYSBACKUP FROM V$PWFILE_USERS;
 SELECT _ FROM DBA_ROLES; //DBA'A AİT ROLLER. DBA'DE BİR ROL AMA BAŞKA ROLLERE SAHİP OLABİLİYOR.
 SELECT _ FROM DBA_ROLE_PRIVS WHERE GRANTED_ROLE = 'DBA';
+
 STARTUP //ORACLE DATABASE BAŞLATMA KOMUTU
 NOMOUNT:
 STARTUP NOMOUNT //KOMUTU INSTANCE'I START EDER.
@@ -407,6 +528,7 @@ ARCHIVE DOSYALARI KONTROL EDİLİR YOKSA EĞER HATA VERİR.
 RECOVERY İŞLERİ İÇİN KULLANILIR.
 BU MOD YEDEK ALMAK İÇİN KULLANILIR. DIŞARIDAN KULLANIMA KAPALIDIR.
 KULLANICILAR CONNECT OLAMAZ.
+
 MOUNT:
 STARTUP MOUNT //KOMUTU
 NOMOUNT'DAKİLER DAHİL OLUR. ARDINDAN
@@ -418,12 +540,16 @@ VERİTABANI DOSYALARI O TAHSİL EDİLMİŞ BELLEK ALANLARIYLA İLİŞKİLENDİR�
 BU MOD DAHA ÇOK RECOVERY, DB OBJELERİNİ(TABLE, VIEW VS...) YENIDEN ADLANDIRMA
 VEYA BAKIM ONARIM İŞLEMLERİ İÇİN KULLANILIR.
 SADECE DBA YETKİLİ BİR KULLANICIYA AÇIKTIR NORMAL KULLANICILARA DEĞİL!
+
 OPEN
 STARTUP OPEN //OPEN ZORUNLU DEĞİL İKİSİ AYNI ŞEY.
 MOUNT İLE AYNIDIR TEK FARK NORMAL KULLANICILARADA AÇILMIŞ OLMASIDIR.
+
 NOMOUNT MODUNDAYKEN
 ALTER DATABASE MOUNT //ILE MOUNT'A GEÇEBİLİRİZ.
+
 ALTER DATABASE OPEN //ILE MOUNT'DAN OPEN'A GEÇEBİLİRİZ.
+
 RESTRICT
 STARTUP RESTRICT
 ALTER SYSTEM ENABLE RESTRICTED SESSION;
@@ -434,11 +560,13 @@ DIŞARIDAN YENI BAĞLANTILARA İZİN VERİLMEZ!
 YENİ KULLANICILAR CONNECT OLAMAZ!
 SADECE DBA VE RESTRICTED SESSION ROLUNE SAHIP OLAN KULLANICILAR
 CONNECT OLABİLİRLER.
+
 MIGRATE - UPGRADE
 STARTUP MIGRATE
 STARTUP UPGRADE
 VERİTABANI GÜNCELLEME ALACAĞINDA(PATCH - YAMA) ALACAĞI
 GEÇİLECEĞİ ZAMAN BU MODA GEÇİYORUZ. BU MODDA UPDATE OLUYOR.
+
 FORCE
 STARTUP FORCE
 VERİTABANI DEBUG İŞLEMLERİNDE DATABASE BU MODDA AÇILIR.
@@ -448,27 +576,35 @@ DEBUG EDİLİR. BU MOD BUNUN İÇİN VARDIR.
 FORCE MOD GANNIRTTIRTMALI MODDUR ÇOK MECBUR KALINMADIKÇA
 KULLANILMAMALIDIR. ÇÜNKÜ ZAMANLA BUGLAR BİRİKİR
 SIKINTIYA SEBEP OLABİLİR.
+
 SELECT INSTANCE_NAME, STATUS FROM V$INSTANCE;
 SELECT NAME, OPEN_MODE FROM V$DATABASE; //BU KOMUT MOUNT EDİLDİYSE ÇALIŞIR NOMOUNT'DA ÇALIŞMAZ.
 SHUTDOWN IMMEDIATE; //VERITABANINI KAPATIR.
 lsnrctl status //LISTENER YANİ BAĞLANTI DİNLEYİCİNİN DURUMUNA BAKARIZ.
 lsnrctl stop //LISTENER'I KAPATIR.
 STARTUP NOMOUNT
+
 ALTER DATABASE MOUNT //ILE MOUNT'A GEÇEBİLİRİZ.
+
 ALTER DATABASE OPEN //ILE MOUNT'DAN OPEN'A GEÇEBİLİRİZ.
+
 SELECT TABLESPACE_NAME, FILE_NAME, BYTES
 FROM DBA_DATA_FILES;
+
 SELECT NAME FROM V$DATAFILE;
 SHUTDOWN IMMEDIATE; //AÇIK OLAN/VAR OLAN SESSION'LARI KILL EDER. AÇIK OLAN TRANSACTIONLARI SONLANDIRIR VE VERİTABANINI TUTARLI BİR ŞEKİLDE SONLANDIRIR.
 mv users01.dbf new_users01.dbf
 pwd
 ALTER DATABASE RENAME FILE '/u01/app/oracle/oradata/ORCL/users01.dbf' TO '/u01/app/oracle/oradata/ORCL/new_users01.dbf'
+
 RESTRICTED
 STARTUP RESTRICT //VERİTABANI KAPALIYKEN
 ALTER SYSTEM ENABLE RESTRICTED SESSION; //OPEN MODDAYKEN.
+
 RESTRICT MODDAN NORMAL YANİ OPEN MODA ALMAK İÇİN
 SHUTDOWN, STARTUP
 ALTER SYSTEM DISABLE RESTRICTED SESSION;
+
 ALTER SYSTEM ENABLE RESTRICTED SESSION; //OPEN MODDAYKEN.
 ALTER SYSTEM DISABLE RESTRICTED SESSION; //RESTRICT MODU KAPATIR VE NORMAL MODA GİRER.
 SELECT INSTANCE_NAME, HOST_NAME, STATUS
@@ -476,6 +612,7 @@ FROM V$INSTANCE;
 SELECT USERNAME, SID, SERIAL#, TYPE
 FROM V$SESSION
 WHERE TYPE <> 'BACKGROUND'; //BU KOMUT VERİTABANINA BAĞLI OLAN BAĞLANTILARI VERİR BACKGROUND YAZANLAR SİSTEMİN KENDİ HİZMETLERİDİR.
+
 ##RESTRICTED SESSION ROLUNE SAHİP OLAN KULLANICILARI GETİRİR. ##
 SELECT DR.GRANTEE
 FROM DBA_SYS_PRIVS DS, DBA_ROLE_PRIVS DR
@@ -486,9 +623,13 @@ SELECT USERNAME
 FROM DBA_SYS_PRIVS DS, DBA_USERS DU
 WHERE DS.PRIVILEGE = 'RESTRICTED SESSION'
 AND DS.GRANTEE = DU.USERNAME;
+
 ## VIEW'I SORGULAMA
+
 SELECT \* FROM KILL_SESSION;
+
 ## RESTRICTED SESSION ROLUNE SAHİP OLAN KULLANICILARI KILL EDECEK KOMUTU VERİR.
+
 CREATE OR REPLACE VIEW KILL_SESSION
 AS
 SELECT 'ALTER SYSTEM KILL SESSION ''' || SID || ',' || SERIAL# ||''' IMMEDIATE;' AS KILL_QUERY
@@ -507,10 +648,12 @@ FROM DBA_SYS_PRIVS DS, DBA_USERS DU
 WHERE DS.PRIVILEGE = 'RESTRICTED SESSION'
 AND DS.GRANTEE = DU.USERNAME);
 ALTER SYSTEM KILL SESSION '240,14168' IMMEDIATE; //İLGİLİ RESTRICTED SESSION'A SAHİP OLMAYAN KULLANICIYI KİLL EDER!! BOĞAZLAR.
+
 sqlplus SYS/SYS //BAĞLANAMAZ ÇÜNKÜ SYS'NİN BAĞLANABİLMESİ İÇİN DBA ROLUNE SAHİP OLMASI GEREKMEKTE. YOKSA OLMAZ!
 sqlplus SYS/SYS AS SYSDBA === sqlplus / as sysdba //ikisi aynı anlama gelmektedir.
 show user
 clear screen
+
 temel bazı sorgulamalar:
 sqlplus / as sysdba //windows authentication.
 desc V$VERSION //VERSION ISIMLI VIEW'IN VERİ YAPISINI SORGULAR.
@@ -530,26 +673,33 @@ DESC V$INSTANCE;
 SELECT INSTANCE_NAME, HOST_NAME, STATUS
 FROM V$INSTANCE;
 SHOW PARAMETER SERVICE_NAME;
+
 2>
 SELECT INSTANCE_NAME, STATUS, LOGINS FROM V$INSTANCE;
 sql HR/HR
 desc EMPLOYEES;
 UPDATE EMPLOYEES
 SET SALARY = SALARY \* 1.5;
+
 1>
 SHUTDOWN //NORMAL MOD
 SHUTDOWN NORMAL //BUDA NORMAL MOD YANİ 2Sİ AYNI ŞEY.
+
 3>
 sql HR/HR //bağlantı açılamaz çünkü update komutu commit edilmediği için transaction sonlandırılmadı.
 //çünkü açık transaction ve açık bağlantı var.
+
 //budurumda transactionları sonlandırmak lazım gelir.
 //trasactionları sonlandırabilmek için 2 yöntem vardır.
+
 1. commit veriyi kalıcı yansıt işlem bitsin.
 2. rollback yapılan işlemi geri al işlem bitsin gitsin.
-//hangını tercih edersen et.
+   //hangını tercih edersen et.
+
 2> ROLLBACK;
 //SHUTDOWN YİNE ÇALIŞMAZ ÇÜNKÜ BAZI BAĞLANTILAR AÇIK ONLARINDA KAPATILMASINI BEKLEYECEK.
 //AÇIK OLAN BAĞLANTILARI KAPATTIĞIMIZDA KÜT DİYE KAPANIR!
+
 1>
 sql / as sysdba
 STARTUP
@@ -568,6 +718,7 @@ SHUTDOWN IMMEDIATE;
 YAPILAN TÜM DEĞİŞİKLİKLER REDOLOG YABİ BUFFER CACHE'A YAZAR
 DBWRITER BACKGROUND PROCESS'I ZAMAN ZAMAN
 REDOLOG YANİ BUFFER CACHE'DAN ALIP DATAFILLARA YAZAR.
+
 */
 SHUTDOWN IMMEDIATE;
 //BU KOMUT YENİ GİRİŞLERİ ENGELLER.
@@ -583,6 +734,7 @@ SHUTDOWN TRANSACTIONAL;
 sql HR/HR
 UPDATE EMPLOYEES
 SET SALARY = SALARY *1.30;
+
 /\*
 SHUTDOWN ABORT;
 //BU KOMUT ÇALIŞTIRILDIĞINDA
@@ -597,7 +749,9 @@ VERİ BÜTÜNLÜĞÜ BOZULUR.
 VERİTABANININ TEKRAR AÇILMASI ÇOK UZUN SÜRER.
 BU MOD TEHLİKELİDİR. ÇÜNKÜ VERİTABANI BU METOTDA
 KAPATILIRSA TUTARSIZ KAPANIR VE RECOVERY GEREKİR.
+
 \*/
+
 /\*
 ARCHIVE LOG MODE.
 VERİTABANINDA YAPILAN TÜM DEĞİŞİKLİKLERİN OTOMATİK OLARAK BİR YEDEĞİNİ
@@ -607,6 +761,7 @@ VERİTBANI PERFORMANSI NOARCHIVELOG MODE'A GÖRE BİRAZ DAHA YAVAŞTIR.
 ARHIVELOG MODE'DA ÇALIŞAN VERİTBANINDA ARŞİV DOSYALARI GEÇMİŞ
 BİR ZAMAN DİLİMİNE DÖNMEK İÇİN DAHA ÇOK DA RECOVERY(KURTARMA)
 İŞLEMLERİ İÇİN KULLANILIR.
+
 NEDEN ARHIVELOG MODDA ÇALIŞMALIYIZ?
 VERİTBANI INSTALL EDİLDİĞİNDE 3 ADET REDOLOG DOSYASI OLUŞUR.
 YAPILAN TÜM DEĞİŞİKLİKLER BU REDOLOG DOSYALARINA YAZILIR.
@@ -618,18 +773,23 @@ DOLAYISIYLA BİRİNCİ REDOLOG DOSYASINDAKİ ESKİ VERİLER KAYBEDİLİR.
 VERİTBANINDA ARCHIVELOG MODE ÇALIŞTIRIRSAK VERİLER
 REDOLOG DOSYALARI DOLSA BİLE VERİLER AYRI DOSYALARDA
 TUTULACAĞI İÇİN DEĞİŞEN VERİ KAYBI OLMAYACAKTIR.
+
 ## UYGULAMA
+
 1>
 sql / as sysdba
 startup
 SELECT A.MEMBER, A.STATUS, B.BYTES
 FROM V$LOGFILE A, V$LOG B
 WHERE A.GROUP# = B.GROUP#;
+
 SELECT NAME, OPEN_MODE, LOG_MODE
 FROM V$DATABASE;
+
 SHOW PARAMETER db_recovery_file_dest;
 //fast recovery area'yı verir hacı.
 //bu klasör yolu aslında kurtarma dosyalarının bulunduğu kısımdır.
+
 2>
 SHUTDOWN IMMEDIATE;
 STARTUP MOUNT;
@@ -640,6 +800,7 @@ SHUTDOWN ABORT KOMUTU ARHIVELOG MODE AÇIK OLMADAN
 ÇALIŞTIRILIRSA BÜYÜK RİST TAŞIR.
 ARCHIVELOG MODE AÇIKKEN ÇALIŞTIRILIRSA VERİLER
 KURTARILABİLİR.
+
 /\*
 ABORT SENARYONU
 VERİTABANINDA BİR SORUN OLDUĞUNDA SORUNDAN DOLAYISIYLA
@@ -660,6 +821,7 @@ OTOMATİK OLARAK VERİTABANINA YANİ DATAFILE'LARA YAZACAK
 DOLAYISIYLA BİR TUTARLILIK ELDE EDECEĞİZ.
 ALTER SYSTEM CHECKPOINT;
 //BU KOMUTTA YUKARIDAKI ILE AYNI İŞİ YAPAR.
+
 //BU KOMUTLARADAN SONRA
 SHUTDOWN ABORT //KOMUTU ÇALIŞTIRILABİLİR.
 REDOLOG/BUFFER CACHE'DE TUTULAN VERİLER ORIJINAL DATAFILELLARA YUKARIDAKI KOMUTLAR İLE YAZILDIĞI İÇİN
@@ -672,6 +834,7 @@ SAĞLAYAN VERİTABANI AÇILMA MODUDUR.
 STARTUP RESTRICT //SADECE DBA YETKİLİLER GİREBİLİR. BU MODDA AÇMAMIZIN SEBEBİ BAŞKALARI GİRERSE VERİDE DEĞİŞİKLİK YAPABİLİR YAPAMASIN DİYE. BAŞKASI GİRERSE TUTARSIZLIK OLUŞABİLİR.
 SHUTDOWN IMMEDIATE; //CONNECTİON'LARI KILL EDER. TRANSACTİONLARI COMMITLER.
 \*/
+
 /\*ORACLE DATABASE HANGİ ARAÇLARLA KAPATILIP AÇILABİLİR?
 DBA YETKİLİ OLARAK BAĞLANAN HER ARAÇLA YAPILABİLR.
 sqlplus //Oracle'a ait.
@@ -682,26 +845,34 @@ SQL Developer //Oracle'a ait.
 Toad //Oracle'a ait değil.
 RMAN(Recovery Manager) //Oracle'a ait.
 Services.mcs(Windows) //Oracle'a ait değil. Microsoft'a ait.
+
 \*/
+
 /\*
 ORACLE DATABASE NETWORK
+
 NETWORK KONFİGURASYON ARAÇLARI(NETWORKING TOOLS)
 ORACLE_HOME/bin //bunun altında bulunur.
+
 1. NETWORK CONFİGURATİON ASSİSTANT (NETCA) //HEM WINDOWS HEMDE LINUX'A OTOMATİK YÜKLENİYOR.
 2. NETWORK MANAGER (NETMGR) //19C'DE WINDOWS'A OTOMATİK YÜKLENMİYOR AMA LINUX'A YÜKLENİYOR.
-BU IKI ARAÇTAN BİRİNİ KULLANARAK NETWORK YAPILANDIRMASI YAPABİLİRİZ.
-MANUEL YÖNTEMLERLE NETWORK KONFİGURATİON YAĞILABİLİR.
-(EDIT, NOTEPAD, VI, VIM)
+   BU IKI ARAÇTAN BİRİNİ KULLANARAK NETWORK YAPILANDIRMASI YAPABİLİRİZ.
+   MANUEL YÖNTEMLERLE NETWORK KONFİGURATİON YAĞILABİLİR.
+   (EDIT, NOTEPAD, VI, VIM)
+
 NETWORK KONFİGURATİON DOSYALARI(NETWORKING FILES)
 ORACLE_HOME/network/admin
 LISTENER.ORA //DIŞARDAN GELEN BAĞLANTILARI DİNLER.
 //BU DOSYAYI YAPILANDIRMADIĞIMIZ SÜRECE DIŞARIDAN CONNECT OLMAK MÜMKÜN DEĞİLDİR.
 TNSNAMES.ORA
 SQLNET.ORA //bu dosya yoksa işletim sistemi kimlik doğrulaması(OS Authentication) ile bağlanılamaz.
+
 ALTER USER HR IDENTIFIED BY HR ACCOUNT UNLOCK;
+
 win>netca
 win> lsnrctl start LISTENER //windows'a cmd admin yetkisi ile açılmalı.
 win> lsnrctl stop LISTENER //windows'a cmd admin yetkisi ile açılmalı.
+
 NETWORK MANAGER (NETMGR)
 lin>cd $ORACLE_HOME
 cd network/admin
@@ -716,39 +887,51 @@ select name from v$database; //sid sorgular.
 ls
 cat listener.ora
 netca
+
 sqlnet.ora vs tnsnames.ora tanımlama (Windows)
 netca(Network Configuration Assistant)
 sqlnet.ora //veritbanaı bağlantı metotlarının tanımlandığı dosya.
 tnsnames.ora //veritabanı bağlantısı için takma adlar(yani kısa yollar) tanımlandığı dosya.
 tnsping //tnsnames.ora içinde tanımlı olan takma isimlerin çalışıp çalışmadığını kontrol eden araç
+
 tnsping TESTDB //testsb takma adttır ping attık. o da bize cevap verdi.
+
 NETWORK MANAGER (NETMGR) Linux
 lin>hostname
 \*/
+
 EAST CONNECT
 WİN>win>sqlplus SYS/oracle123@192.168.1.105:1521/TEST as sysdba //SYS kullanıcısı için sysdba rolü vermeden bağlanamayız.
 WİN>Lin>sqlplus SYS/oracle123@192.168.1.106:1521/ORCL.HUSEYINAYDIN.COM.TR as sysdba //SYS kullanıcısı için sysdba rolü vermeden bağlanamayız.
 LİN>WİN>sqlplus SYS/oracle123@192.168.1.105:1521/TEST as sysdba
 LİN>WİN>sqlplus SYS/oracle123@192.168.1.105:1522/TEST as sysdba
+
 sudo shutdown -h now
 Bu komut, sistemi hemen kapatır. -h seçeneği sistemi durdurmayı (halt) ve now ise işlemi hemen gerçekleştirmeyi belirtir. Eğer belirli bir zaman sonra kapatmak istersen, now yerine süre belirtebilirsin, örneğin:
+
 bash
 Kodu kopyala
 sudo shutdown -h +10
 Bu komut sistemi 10 dakika sonra kapatır.
+
 "Halt" kelimesi durdurmak anlamına gelir.
 shutdown -h veya halt komutu, sistemi kapatır ancak bilgisayarın güç kaynağını kesmez.
 Bu, sistemin tüm işlemlerini durdurur ve güvenli bir şekilde kapanmasını sağlar, ancak fiziksel olarak bilgisayarın gücünü kapatmaz.
+
 Oracle Linux'ta (ve genel olarak Unix benzeri sistemlerde) shutdown komutunu -h seçeneği olmadan kullanırsan, sistemin varsayılan olarak kapanma işlemini başlatır. Ancak, tam olarak ne yapılacağını belirtmek için ek seçenekler eklemek genellikle gereklidir. İşte bazı yaygın seçenekler:
+
 shutdown -h veya shutdown --halt: Sistemi kapatır.
 shutdown -r veya shutdown --reboot: Sistemi yeniden başlatır.
 shutdown -P veya shutdown --poweroff: Sistemi tamamen kapatır ve güç keser.
 Eğer hiçbir seçenek belirtmezsen ve sadece shutdown komutunu kullanırsan,
 komut genellikle sistemin kapanacağını duyurur ve varsayılan olarak bir dakika sonra sistem kapanmaya başlar.
 Bu esnada kullanıcılar uyarılır ve işlemlerini sonlandırmak için zaman tanınır.
+
+```
 SELECT USERNAME, SID, SERIAL#, TYPE
 FROM V$SESSION
 WHERE TYPE <> 'BACKGROUND';
+
 SELECT DR.GRANTEE
 FROM DBA_SYS_PRIVS DS, DBA_ROLE_PRIVS DR
 WHERE DS.PRIVILEGE = 'RESTRICTED SESSION'
@@ -758,6 +941,7 @@ SELECT USERNAME
 FROM DBA_SYS_PRIVS DS, DBA_USERS DU
 WHERE DS.PRIVILEGE = 'RESTRICTED SESSION'
 AND DS.GRANTEE = DU.USERNAME;
+
 SELECT 'ALTER SYSTEM KILL SESSION ''' || SID || ',' || SERIAL# ||''' IMMEDIATE;'
 FROM V$SESSION
 WHERE
@@ -773,7 +957,9 @@ SELECT USERNAME
 FROM DBA_SYS_PRIVS DS, DBA_USERS DU
 WHERE DS.PRIVILEGE = 'RESTRICTED SESSION'
 AND DS.GRANTEE = DU.USERNAME);
+
 SELECT * FROM KILL_SESSION;
+
 CREATE OR REPLACE VIEW KILL_SESSION
 AS
 SELECT 'ALTER SYSTEM KILL SESSION ''' || SID || ',' || SERIAL# ||''' IMMEDIATE;' AS KILL_QUERY
@@ -791,7 +977,10 @@ SELECT USERNAME
 FROM DBA_SYS_PRIVS DS, DBA_USERS DU
 WHERE DS.PRIVILEGE = 'RESTRICTED SESSION'
 AND DS.GRANTEE = DU.USERNAME);
+
 ALTER SYSTEM KILL SESSION '240,14168' IMMEDIATE;
+```
+
 ![Ekran görüntüsü 2024-07-20 000954](https://github.com/user-attachments/assets/6c54885d-f64e-4760-957e-ab8bfc050701)
 ![Ekran görüntüsü 2024-07-19 201537](https://github.com/user-attachments/assets/1ec9fc7b-af23-439c-a7d0-cfe429ae2995)
 ![Ekran görüntüsü 2024-07-19 194823](https://github.com/user-attachments/assets/d5a650cd-3ac7-49cc-95b5-50a5f7a0c0a6)
